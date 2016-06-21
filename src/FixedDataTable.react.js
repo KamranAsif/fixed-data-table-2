@@ -30,7 +30,7 @@ var emptyFunction = require('emptyFunction');
 var invariant = require('invariant');
 var joinClasses = require('joinClasses');
 var shallowEqual = require('shallowEqual');
-var translateDOMPositionXY = require('translateDOMPositionXY');
+var FixedDataTableTranslateDOMPosition = require('FixedDataTableTranslateDOMPosition');
 
 var {PropTypes} = React;
 var ReactChildren = React.Children;
@@ -104,6 +104,11 @@ var FixedDataTable = React.createClass({
      * Either `height` or `maxHeight` must be specified.
      */
     height: PropTypes.number,
+
+    /**
+     * Class name to be passed into parent container
+     */
+    className: PropTypes.string,
 
     /**
      * Maximum pixel height of table. If all rows do not fit,
@@ -624,6 +629,7 @@ var FixedDataTable = React.createClass({
     return (
       <div
         className={joinClasses(
+          this.state.className, 
           cx('fixedDataTableLayout/main'),
           cx('public/fixedDataTable/main'),
         )}
@@ -1183,6 +1189,14 @@ var HorizontalScrollbar = React.createClass({
     size: PropTypes.number.isRequired,
   },
 
+  componentWillMount() {
+    this._initialRender = true;
+  },
+
+  componentDidMount() {
+    this._initialRender = false;
+  },
+
   render() /*object*/ {
     var outerContainerStyle = {
       height: Scrollbar.SIZE,
@@ -1194,10 +1208,11 @@ var HorizontalScrollbar = React.createClass({
       overflow: 'hidden',
       width: this.props.size,
     };
-    translateDOMPositionXY(
+    FixedDataTableTranslateDOMPosition(
       innerContainerStyle,
       0,
-      this.props.offset
+      this.props.offset,
+      this._initialRender,
     );
 
     return (
